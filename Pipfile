@@ -13,6 +13,8 @@ lab = "*"
 gym = "*"
 jupyterlab = "*"
 tqdm = "*"
+binarytree = "*"
+pylint = "*"
 
 [requires]
 python_version = "3.7"
