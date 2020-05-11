@@ -12,7 +12,7 @@ import json
 
 def main(args):
     # Create an environment
-    envname = 'Acrobot-v1'
+    envname = args.envname
     env = gym.make(envname)
     SEED = 505
     env.seed(SEED)
@@ -25,7 +25,7 @@ def main(args):
     # Explore action space
     print("Action space:", env.action_space)
 
-    n_bins = 2
+    n_bins = args.n_bins
     tq = QTree(env.observation_space.low, env.observation_space.high, n_bins, env.action_space.n, adaptive=args.adaptive, p=args.p)
     agent = QLearningAgent(env, tq)
 
@@ -56,7 +56,7 @@ def main(args):
                     if avg_score > max_avg_score:
                         max_avg_score = avg_score
                 if i_episode % 100 == 0:
-                    print("\rEpisode {}/{} | Max Average Score: {}".format(i_episode, num_episodes, max_avg_score), end="")
+                    print("\rEpisode {}/{} | Max Average Score: {}, tree-size: {}".format(i_episode, num_episodes, max_avg_score, len(tq.qtree)), end="")
                     sys.stdout.flush()
         return scores
 
@@ -75,6 +75,8 @@ if __name__ == '__main__':
     parser.add_argument('-n', '--num-episodes', type=int, default=10000)
     parser.add_argument('--p', type=int, default=1000)
     parser.add_argument('--score-file', type=str, default='score_history.json')
+    parser.add_argument('--envname', type=str)
+    parser.add_argument('--n-bins', type=int, default=2)
 
     args = parser.parse_args()
     main(args)
