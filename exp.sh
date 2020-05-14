@@ -1,0 +1,1 @@
+python experiment.py --envname MountainCar-v0 --score-file MC-adaptive-b4p10000.json --n-bins 4 --adaptive --p 10000 --num-episodes 30000

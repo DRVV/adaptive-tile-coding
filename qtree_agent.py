@@ -1,5 +1,7 @@
 import numpy as np
 from qtree import QTree
+from timeit import default_timer
+
 
 class QLearningAgent:
     """Q-Learning agent that can act on a continuous state space by discretizing it."""
@@ -24,6 +26,8 @@ class QLearningAgent:
         self.epsilon_decay_rate = epsilon_decay_rate   # how quickly should we decrease epsilon
         self.min_epsilon = min_epsilon
 
+        self.exec_counter = 0
+
     def reset_episode(self, state):
         """Reset variables for a new episode."""
         # Gradually decrease exploration rate
@@ -31,7 +35,10 @@ class QLearningAgent:
         self.epsilon = max(self.epsilon, self.min_epsilon)
         
         self.last_state = state
-        Q_s = [self.tq.get(state, action, return_index=False) for action in range(self.action_size)]
+        #Q_s = [self.tq.get(state, action, return_index=False) for action in range(self.action_size)]
+        #Q_s = self.tq.get(state, action=None)
+        _, node = self.tq.get(state, action=None)
+        Q_s  =node.q
         self.last_action = np.argmax(Q_s)
         return self.last_action
     
@@ -41,7 +48,9 @@ class QLearningAgent:
 
     def act(self, state, reward=None, done=None, mode='train'):
         """Pick next action and update internal Q table (when mode != 'test')."""
-        Q_s = [self.tq.get(state, action, return_index=False) for action in range(self.action_size)]
+        #Q_s = [self.tq.get(state, action, return_index=False) for action in range(self.action_size)]
+        Q_s, _ = self.tq.get(state, action=None)
+        
         # Pick the best action from Q table
         greedy_action = np.argmax(Q_s)
         if mode == 'test':
@@ -51,8 +60,15 @@ class QLearningAgent:
             # Train mode (default): Update Q table, pick next action
             # Note: We update the Q table entry for the *last* (state, action) pair with current state, reward
             value = reward + self.gamma * max(Q_s)
+
+            self.exec_counter += 1
+            timer_start = default_timer()            
             self.tq.update(self.last_state, self.last_action, value, self.alpha)
-            
+            timer_end = default_timer()
+            timer_diff = timer_end - timer_start
+            if self.exec_counter % 1000 == 0:
+                #print(f'tq.update: {timer_diff:.3f} sec / update')
+                self.exec_counter = 0
             # Exploration vs. exploitation
             do_exploration = np.random.uniform(0, 1) < self.epsilon
             if do_exploration:

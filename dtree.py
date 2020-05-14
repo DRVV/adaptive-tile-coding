@@ -31,13 +31,13 @@ def _d_build_tree_string(root, curr_index, index=False, delimiter='-'):
     line1 = []
     line2 = []
     if index:
-        node_repr = '{}{}{}'.format(curr_index, delimiter, root.value)
+        node_repr = '{}{}{:.3f}'.format(curr_index, delimiter, root.value)
     else:
         #node_repr = str(root.value)
         if root.dim is None:
             node_repr = '{}'.format(root.value)
         else:
-            node_repr = 'X{}<{}'.format(root.dim, root.value)
+            node_repr = 'X{}<{:.3f}'.format(root.dim, root.value)
 
     new_root_width = gap_size = len(node_repr)
 
